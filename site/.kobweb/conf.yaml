@@ -1,0 +1,14 @@
+site:
+  title: "Kizito_Portfolio"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "build/kotlin-webpack/js/developmentExecutable/kizito_portfolio.js"
+      api: "build/libs/kizito_portfolio.jar"
+    prod:
+      script: "build/kotlin-webpack/js/productionExecutable/kizito_portfolio.js"
+      siteRoot: ".kobweb/site"
+
+  port: 8080
