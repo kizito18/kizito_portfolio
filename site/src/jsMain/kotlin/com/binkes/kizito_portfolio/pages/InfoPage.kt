@@ -35,6 +35,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Video
@@ -370,8 +371,8 @@ private fun VideoPlayer(
         if (showThumbnail) {
             Image(
                 modifier = Modifier
-                    .maxWidth(100.percent)
-                    .maxHeight(100.percent)
+                    .width(100.percent)
+                    .height(100.percent)
                     .aspectRatio(16.0 / 9.0)
                     .borderRadius(15.px),
                 src = thumbnail,
@@ -384,11 +385,12 @@ private fun VideoPlayer(
         Box {
 
 
+
             // Video element without controls
             Video(
                 attrs = Modifier
-                    .maxWidth(100.percent)
-                    .maxHeight(100.percent)
+                    .width(100.percent)
+                    .height(100.percent)
                     .borderRadius(20.px)
                     //.objectFit(ObjectFit.Contain)
                     .onMouseOut {
@@ -400,25 +402,39 @@ private fun VideoPlayer(
                     .aspectRatio(16.0 / 9.0)  // 16:9 aspect ratio
                     .toAttrs {
                         attr("src", videoUrl)
+                        //attr("poster", thumbnail)
+                        attr("controls", "false")
+                        attr("playsinline", "true")
                        // attr("playsinline", "true")
 
                         attr("muted", "true")      // required for autoplay
                         attr("autoplay", "true")   // hint browser to autoplay
 
-                       // attr("preload", "auto") // Helps with caching by preloading metadata
+                        attr("preload", "auto") // Helps with caching by preloading metadata
+                        attr("loop", "true")
 
                         ref { element ->
                             videoRef.value = element
 
-                            element.onended = {
+                            videoRef.value?.playsInline = true
+                            videoRef.value?.controls = false
+                            videoRef.value?.muted = true
+                            videoRef.value?.autoplay = true
+                            //videoRef.value?.poster = thumbnail
+                            videoRef.value?.preload = "auto"
+                            videoRef.value?.loop = true
+
+
+                            videoRef.value?.onended = {
                                 showThumbnail = false
                                 isPlaying = false
                             }
 
                             // play as soon as it's ready
-                            element.oncanplay = {
+                            videoRef.value?.oncanplay = {
                                 showThumbnail = false
-                                element.muted = true  // ensure muted
+                               // element.muted = true  // ensure muted
+                                //element.controls = false
 
                                 // Try to play and handle any errors
                                 /*
@@ -427,16 +443,18 @@ private fun VideoPlayer(
                                     // Fallback: show controls if autoplay is blocked
                                     element.setAttribute("controls", "true")
                                 }
-
                                  */
 
-                                element.play()
+                               // element.play()
                                 isPlaying = true
+                                videoRef.value?.play()?.catch {
+                                    isPlaying = false
+                                }
                             }
 
 
                             // video failed to load (invalid or broken URL)
-                            element.onerror = { _: dynamic, _: String, _: Int, _: Int, _: Any? ->
+                            videoRef.value?.onerror = { _: dynamic, _: String, _: Int, _: Int, _: Any? ->
                                 // console.log(" Video failed to load: $videoUrl")
                                 videoRef.value = null
                                 null // must return dynamic (usually null)
@@ -451,13 +469,14 @@ private fun VideoPlayer(
 
 
                             onDispose {
-                                element.pause()
+                                videoRef.value?.pause()
                                 isPlaying = false
                                 videoRef.value = null
                             }
                         }
                     }
             )
+
 
 
 
@@ -479,7 +498,7 @@ private fun VideoPlayer(
                         .padding(5.px)
                         .transition(Transition.Companion.of(property = "translate", duration = 200.ms))
                         // .position(Position.Sticky)
-                        .position(Position.Absolute)
+                       // .position(Position.Absolute)
                         .align(Alignment.Center)
                         .onMouseOut {
                             isCustomControlFocused = false
@@ -498,9 +517,10 @@ private fun VideoPlayer(
                                     isPlaying = true
                                 }
                             }
-                        },
+                        }
+                        .zIndex(2),
                     src = if (isPlaying) ResObject.Icon.pause_icon else ResObject.Icon.play_icon,
-                    alt = "close icon"
+                    alt = "Play pause icon"
                 )
 
 
@@ -513,9 +533,10 @@ private fun VideoPlayer(
                                     if (breakpoint <= Breakpoint.LG) 30.px else 32.px
                         )
                         .align(Alignment.BottomEnd)
+                        .alignSelf(AlignSelf.SelfEnd)
                         .cursor(Cursor.Pointer)
                         //.position(Position.Sticky)
-                        .position(Position.Absolute)
+                        //.position(Position.Absolute)
                         .margin(12.px)
                         .borderRadius(20.percent)
                         .padding(all = 2.px)
@@ -535,7 +556,8 @@ private fun VideoPlayer(
                                     js("document.exitFullscreen()")
                                 }
                             }
-                        },
+                        }
+                        .zIndex(2),
                     src = ResObject.Icon.video_full_screen_icon,
                     alt = "Fullscreen"
                 )

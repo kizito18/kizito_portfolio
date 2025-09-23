@@ -40,12 +40,12 @@ kobweb {
             }
 
 
-            head.add {
-                link {
-                    rel = "stylesheet"
-                    href ="https://vjs.zencdn.net/8.23.3/video-js.css"
-                }
-            }
+//            head.add {
+//                link {
+//                    rel = "stylesheet"
+//                    href ="https://vjs.zencdn.net/8.23.3/video-js.css"
+//                }
+//            }
 
 
         }
