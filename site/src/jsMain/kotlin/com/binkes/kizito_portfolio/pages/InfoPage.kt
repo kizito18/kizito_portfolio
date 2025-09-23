@@ -366,7 +366,8 @@ private fun VideoPlayer(
     ) {
 
 
-        if (showThumbnail){
+
+        if (showThumbnail) {
             Image(
                 modifier = Modifier
                     .maxWidth(100.percent)
