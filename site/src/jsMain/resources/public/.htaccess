@@ -1,0 +1,35 @@
+RewriteEngine On
+
+# ---------------------------
+# 1. Serve existing static files like /info/abc.html
+# ---------------------------
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^info/([^/.]+)\.html$ info/$1.html [L]
+
+# ---------------------------
+# 2. All other /info/... traffic goes to SPA (index.html)
+# ---------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^info/.*$ /index.html [L]
+
+
+
+
+
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteBase /
+
+#   # Allow requests for real files or directories
+#   RewriteCond %{REQUEST_FILENAME} -f [OR]
+#   RewriteCond %{REQUEST_FILENAME} -d
+#   RewriteRule ^ - [L]
+
+#   # Allow direct .html files
+#   RewriteCond %{REQUEST_URI} \.html$ [NC]
+#   RewriteRule ^ - [L]
+
+#   # Fallback all other requests to index.html
+#   RewriteRule ^ index.html [L]
+# </IfModule>

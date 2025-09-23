@@ -1,0 +1,5 @@
+---
+  deployment:
+    tasks:
+      - export DEPLOYPATH=/home/zitoxebd/kizito-portfolio.zitoscode.com/
+      - /bin/cp * $DEPLOYPATH
