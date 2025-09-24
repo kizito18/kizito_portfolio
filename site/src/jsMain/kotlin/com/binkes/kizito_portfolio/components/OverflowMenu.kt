@@ -91,6 +91,11 @@ fun OverflowMenu(onMenuClosed: () -> Unit) {
                        .size(
                            if (breakpoint <= Breakpoint.ZERO) 30.px else 35.px
                        )
+                         // Disable right-click / long-press
+                        . onContextMenu { event ->
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
                     ,
                     src = ResObject.Icon.close_icon,
                     alt = "close icon"
@@ -98,7 +103,13 @@ fun OverflowMenu(onMenuClosed: () -> Unit) {
 
 
                 Image(
-                    modifier = Modifier.size(80.px),
+                    modifier = Modifier
+                        .size(80.px)
+                         // Disable right-click / long-press
+                        . onContextMenu { event ->
+                            event.preventDefault()
+                            event.stopPropagation()
+                        },
                     src = ResObject.Image.logo,
                     alt = "Logo Image"
                 )

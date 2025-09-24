@@ -273,6 +273,11 @@ fun MainText(
                         .color(Color.white)
                         .cursor(Cursor.Pointer)
                         .userSelect(UserSelect.None)
+                         // Disable right-click / long-press
+                        .onContextMenu { event ->
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
                         .toAttrs()
                 ) {
 

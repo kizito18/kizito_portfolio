@@ -6,6 +6,7 @@ import com.binkes.kizito_portfolio.styles.InputStyle
 import com.binkes.kizito_portfolio.styles.MainButtonStyle
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.Transition
+import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.css.transition
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.*
@@ -170,6 +171,12 @@ fun ContactForm(breakpoint: Breakpoint) {
                     .backgroundColor(ThemeByKizito.Primary.rgb)
                     .color(Colors.White)
                     .cursor(Cursor.Pointer)
+                    .userSelect(UserSelect.None)
+                    // Disable right-click / long-press
+                    .onContextMenu { event ->
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
                     .toAttrs()
             ) {
                 Text("Submit")
