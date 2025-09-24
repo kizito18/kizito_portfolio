@@ -44,7 +44,7 @@ fun SectionTitle(
 
     ObserveViewportEntered(
         sectionId = section.id,
-        distanceFromTop = 700.0,
+        distanceFromTop = 600.0,
         onViewportEntered = {
 
             scope.launch {

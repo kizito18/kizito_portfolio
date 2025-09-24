@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.binkes.kizito_portfolio.models.Portfolio
 import com.binkes.kizito_portfolio.models.ThemeByKizito
-import com.binkes.kizito_portfolio.styles.PortfolioSectionStyle
+import com.binkes.kizito_portfolio.styles.PortfolioSectionStyleForDesktop
+import com.binkes.kizito_portfolio.styles.PortfolioSectionStyleForMobile
 import com.binkes.kizito_portfolio.util.ConstantsObject
 import com.binkes.kizito_portfolio.util.ResObject
+import com.binkes.kizito_portfolio.util.isDesktop
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -35,7 +37,15 @@ fun PortfolioCard(
 
 
     A(href = "/info/${portfolio.documentId}/",
-        attrs = PortfolioSectionStyle.toModifier()
+        attrs = Modifier
+            .thenIf(
+                condition = isDesktop(),
+                other = PortfolioSectionStyleForDesktop.toModifier()
+            )
+            .thenIf(
+                condition = !isDesktop(),
+                other = PortfolioSectionStyleForMobile.toModifier()
+            )
             .cursor(Cursor.Pointer)
             .thenIf(
                 condition = isRow,
@@ -62,6 +72,13 @@ fun PortfolioCard(
                 }
 
                  */
+
+                // Disable right-click / long-press
+                onContextMenu { event ->
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
 
             }
     ) {

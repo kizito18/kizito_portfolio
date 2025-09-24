@@ -53,7 +53,7 @@ fun AchievementsContent(breakpoint: Breakpoint) {
     val numberToAnimate = remember { mutableStateListOf(0, 0, 0, 0) }
     ObserveViewportEntered(
         sectionId = Section.Achievements.id,
-        distanceFromTop = 700.0,
+        distanceFromTop = 600.0,
         onViewportEntered = {
             isViewportEntered = true
             Achievement.entries.forEach { achievement ->
@@ -61,6 +61,7 @@ fun AchievementsContent(breakpoint: Breakpoint) {
 
                     animatedNumbers(
                         number = achievement.number,
+                        delay = 10L,
                         onUpdate = {
                             numberToAnimate[achievement.ordinal] = it
                         }

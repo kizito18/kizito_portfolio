@@ -7,7 +7,10 @@ import com.binkes.kizito_portfolio.components.SectionTitle
 import com.binkes.kizito_portfolio.models.Portfolio
 import com.binkes.kizito_portfolio.models.Section
 import com.binkes.kizito_portfolio.models.ThemeByKizito
-import com.binkes.kizito_portfolio.styles.PortfolioArrowIconStyle
+import com.binkes.kizito_portfolio.styles.PortfolioArrowIconStyleForDesktop
+import com.binkes.kizito_portfolio.styles.PortfolioArrowIconStyleForMobile
+import com.binkes.kizito_portfolio.styles.PortfolioSectionStyleForDesktop
+import com.binkes.kizito_portfolio.util.isDesktop
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -17,6 +20,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.silk.components.icons.fa.FaArrowLeft
@@ -247,7 +251,15 @@ fun PortfolioNavigation() {
         horizontalArrangement = Arrangement.Center
     ) {
         FaArrowLeft(
-            modifier = PortfolioArrowIconStyle.toModifier()
+            modifier = Modifier
+                .thenIf(
+                    condition = isDesktop(),
+                    other = PortfolioArrowIconStyleForDesktop.toModifier()
+                )
+                .thenIf(
+                    condition = !isDesktop(),
+                    other = PortfolioArrowIconStyleForMobile.toModifier()
+                )
                 .margin(right = 40.px)
                 .cursor(Cursor.Pointer)
                 .onClick {
@@ -257,7 +269,15 @@ fun PortfolioNavigation() {
             size = IconSize.LG
         )
         FaArrowRight(
-            modifier = PortfolioArrowIconStyle.toModifier()
+            modifier = Modifier
+                .thenIf(
+                    condition = isDesktop(),
+                    other = PortfolioArrowIconStyleForDesktop.toModifier()
+                )
+                .thenIf(
+                    condition = !isDesktop(),
+                    other = PortfolioArrowIconStyleForMobile.toModifier()
+                )
                 .cursor(Cursor.Pointer)
                 .onClick {
                     document.getElementById("scrollableContainer")

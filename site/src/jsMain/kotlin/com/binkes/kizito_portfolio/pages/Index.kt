@@ -5,14 +5,13 @@ import com.binkes.kizito_portfolio.components.BackToTopButton
 import com.binkes.kizito_portfolio.components.OverflowMenu
 import com.binkes.kizito_portfolio.models.ThemeByKizito
 import com.binkes.kizito_portfolio.sections.*
+import com.varabyte.kobweb.compose.css.Overflow
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.background
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
-import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
@@ -20,6 +19,8 @@ import com.varabyte.kobweb.silk.theme.breakpoint.rememberBreakpoint
 import kotlinx.browser.document
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.css.vh
+import org.jetbrains.compose.web.css.vw
 
 
 fun navigateScrollToSection(id: String) {
@@ -34,6 +35,7 @@ fun navigateScrollToSection(id: String) {
 }
 
 
+const val  mainScreenScrollLayoutId = "mainScreenScrollLayoutId"
 
 
 @OptIn(DelicateApi::class)
@@ -58,7 +60,7 @@ fun HomePage() {
     // Entire HTML page + assets (like images, scripts, styles) are loaded
     LaunchedEffect(Unit) {
         window.onload = {
-            console.log("✅ Page fully loaded (all assets).")
+            console.log(" Page fully loaded (all assets).")
         }
     }
 
@@ -68,7 +70,7 @@ fun HomePage() {
     // DOM content is ready (without waiting for images/fonts)
     LaunchedEffect(Unit) {
         document.addEventListener("DOMContentLoaded", {
-            //console.log("✅ DOM is fully built, but assets may still be loading.")
+            //console.log(" DOM is fully built, but assets may still be loading.")
             scope.launch {
                 delay(300)
                 isContentReady = true
@@ -78,10 +80,15 @@ fun HomePage() {
 
 
     Box(modifier = Modifier
+        .height(100.vh)
+        .width(100.vw)
         .background(ThemeByKizito.White.rgb)
+        .overflow(Overflow.Hidden)
     ) {
 
-        Box(modifier = Modifier.then(
+        Box(modifier = Modifier
+            .height(100.vh)
+            .then(
             if (isMenuOpened) {
                 Modifier
                     .background(ThemeByKizito.Primary_ALPHA1.rgb)
@@ -97,8 +104,10 @@ fun HomePage() {
             if (isContentReady) {
                 Column(
                     modifier = Modifier
+                        .id(mainScreenScrollLayoutId)
                         .fillMaxSize()
-                        .background(ThemeByKizito.Primary_ALPHA1.rgb),
+                        .background(ThemeByKizito.Primary_ALPHA1.rgb)
+                        .overflow(overflowY = Overflow.Scroll, overflowX = Overflow.Auto),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {

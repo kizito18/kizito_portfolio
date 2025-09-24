@@ -8,13 +8,12 @@ import com.binkes.kizito_portfolio.components.SkillBar
 import com.binkes.kizito_portfolio.models.Section
 import com.binkes.kizito_portfolio.models.Skill
 import com.binkes.kizito_portfolio.models.ThemeByKizito
-import com.binkes.kizito_portfolio.styles.AboutImageStyle
-import com.binkes.kizito_portfolio.styles.AboutTextStyle
-import com.binkes.kizito_portfolio.util.ConstantsObject
+import com.binkes.kizito_portfolio.styles.AboutImageStyleForDesktop
+import com.binkes.kizito_portfolio.styles.AboutImageStyleForMobile
+import com.binkes.kizito_portfolio.styles.AboutTextStyleForDesktop
+import com.binkes.kizito_portfolio.styles.AboutTextStyleForMobile
+import com.binkes.kizito_portfolio.util.*
 import com.binkes.kizito_portfolio.util.ConstantsObject.WHY_HIRE_ME_TEXT
-import com.binkes.kizito_portfolio.util.ObserveViewportEntered
-import com.binkes.kizito_portfolio.util.ResObject
-import com.binkes.kizito_portfolio.util.animatedNumbers
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -23,6 +22,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.silk.components.graphics.Image
@@ -77,15 +77,19 @@ fun AboutContent(){
 
     ObserveViewportEntered(
         sectionId = Section.About.id,
-        distanceFromTop = 300.0,
+        distanceFromTop = 250.0,
         onViewportEntered = {
 
-            isViewportEntered = true
+            scope.launch {
+                delay(1000)
+                isViewportEntered = true
+            }
 
             Skill.entries.forEach { skill->
                 scope.launch {
                     animatedNumbers(
                         number = skill.percentage.value.toInt(),
+                        delay = 30L,
                         onUpdate = {
 
                             animatedPercentage[skill.ordinal] = it
@@ -107,7 +111,7 @@ fun AboutContent(){
         distanceFromTop = 800.0,
         onViewportEntered = {
             scope.launch {
-                delay(2000)
+                delay(1000)
 
                 titleMargin = 20.px
 
@@ -317,12 +321,25 @@ fun  AboutImage(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            modifier = AboutImageStyle.toModifier()
+            modifier = Modifier
+                .thenIf(
+                    condition = isDesktop(),
+                    other = AboutImageStyleForDesktop.toModifier()
+                )
+                .thenIf(
+                    condition = !isDesktop(),
+                    other = AboutImageStyleForMobile.toModifier()
+                )
                 .fillMaxWidth(
                         if (breakpoint <= Breakpoint.ZERO) 60.percent else
                             if (breakpoint <= Breakpoint.ZERO) 40.percent else
                             if (breakpoint <= Breakpoint.MD) 60.percent else 80.percent
-                ),
+                )
+                 // Disable right-click / long-press
+                .onContextMenu { event ->
+                    event.preventDefault()
+                    event.stopPropagation()
+                },
             src = ResObject.Image.about ,
             description = "About Image"
         )
@@ -357,7 +374,15 @@ fun  AboutMe(
 
         RenderMarkdown(
             editText = WHY_HIRE_ME_TEXT,
-            styleModifier = AboutTextStyle.toModifier()
+            styleModifier = Modifier
+                .thenIf(
+                    condition = isDesktop(),
+                    other =  AboutTextStyleForDesktop.toModifier()
+                )
+                .thenIf(
+                    condition = !isDesktop(),
+                    other = AboutTextStyleForMobile.toModifier()
+                )
                 .margin(topBottom = 25.px)
                 .maxWidth(500.px)
                 .fontFamily(ConstantsObject.FONT_FAMILY)

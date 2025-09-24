@@ -71,7 +71,12 @@ fun MainBackground(){
     Image(
         modifier = Modifier
             .fillMaxSize()
-            .objectFit(ObjectFit.Cover),
+            .objectFit(ObjectFit.Cover)
+            . // Disable right-click / long-press
+            onContextMenu { event ->
+                event.preventDefault()
+                event.stopPropagation()
+            },
         src = ResObject.Image.background,
         description = "background image"
     )
@@ -300,7 +305,12 @@ fun MainImage(
                 .fillMaxHeight()
                 .fillMaxWidth()
                 .transition(Transition.of(property = "filter", duration = 200.ms))
-                .overflow(Overflow.Hidden),
+                .overflow(Overflow.Hidden)
+                    // Disable right-click / long-press
+                .onContextMenu { event ->
+                    event.preventDefault()
+                    event.stopPropagation()
+                },
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = if (breakpoint <= Breakpoint.SM) Alignment.End else Alignment.Start
         ) {

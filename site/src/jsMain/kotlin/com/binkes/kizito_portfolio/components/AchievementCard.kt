@@ -60,6 +60,11 @@ fun AchievementCard(
                     .fontWeight(FontWeight.Bolder)
                     .color(ThemeByKizito.Primary.rgb)
                     .userSelect(UserSelect.None)
+                     // Disable right-click / long-press
+                    .onContextMenu { event ->
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
                     .toAttrs()
             ) {
                 Text(

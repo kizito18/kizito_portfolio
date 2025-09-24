@@ -6,10 +6,12 @@ import com.binkes.kizito_portfolio.models.Portfolio
 import com.binkes.kizito_portfolio.models.ThemeByKizito
 import com.binkes.kizito_portfolio.models.getPortfolioByTitle
 import com.binkes.kizito_portfolio.sections.FooterSection
-import com.binkes.kizito_portfolio.styles.ArrowBackStyle
+import com.binkes.kizito_portfolio.styles.ArrowBackStyleForDesktop
+import com.binkes.kizito_portfolio.styles.ArrowBackStyleForMobile
 import com.binkes.kizito_portfolio.styles.VisitProjectStyle
 import com.binkes.kizito_portfolio.util.ConstantsObject
 import com.binkes.kizito_portfolio.util.ResObject
+import com.binkes.kizito_portfolio.util.isDesktop
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
@@ -18,6 +20,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.rememberPageContext
@@ -93,53 +96,62 @@ fun InfoPage() {
             if (portfolioSelected != null) {
 
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .backgroundColor(ThemeByKizito.Primary_ALPHA2.rgb)
-                        .overflow(Overflow.Scroll)
-                ) {
-
-
-                    Image(
-                        modifier = ArrowBackStyle.toModifier()
-                            .cursor(Cursor.Pointer)
-                            .margin(top = 20.px, left = 20.px)
-                            .onClick {
-
-                                //context.router.navigateTo("/")
-                                //  window.location.href = "/"
-
-                                // Simulate browser back button behavior
-                                if (window.history.length > 1) {
-
-                                    window.history.back()
-
-                                } else {
-                                    window.history.replaceState(null, "", "/")
-                                    window.dispatchEvent(PopStateEvent("popstate"))
-
-                                }
-                            }
-                            .size(
-                                if (breakpoint <= Breakpoint.ZERO) 20.px else
-                                    if (breakpoint <= Breakpoint.SM) 30.px else
-                                        if (breakpoint <= Breakpoint.MD) 35.px else
-                                            if (breakpoint <= Breakpoint.LG) 40.px else 44.px
-                            ),
-                        src = ResObject.Icon.arrowBack,
-                        alt = "close icon"
-                    )
-
-
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .backgroundColor(ThemeByKizito.Primary_ALPHA2.rgb)
+                            .overflow(Overflow.Scroll)
                             .scrollBehavior(ScrollBehavior.Smooth),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
+
+
+                        Image(
+                            modifier = Modifier
+                                .thenIf(
+                                    condition = isDesktop(),
+                                    other = ArrowBackStyleForDesktop.toModifier()
+                                )
+                                .thenIf(
+                                    condition = !isDesktop(),
+                                    other = ArrowBackStyleForMobile.toModifier()
+                                )
+                                .cursor(Cursor.Pointer)
+                                .margin(top = 20.px, left = 20.px, bottom = 10.px)
+                                .onClick {
+
+                                    //context.router.navigateTo("/")
+                                    //  window.location.href = "/"
+
+                                    // Simulate browser back button behavior
+                                    if (window.history.length > 1) {
+
+                                        window.history.back()
+
+                                    } else {
+                                        window.history.replaceState(null, "", "/")
+                                        window.dispatchEvent(PopStateEvent("popstate"))
+
+                                    }
+                                }
+                                .size(
+                                    if (breakpoint <= Breakpoint.ZERO) 20.px else
+                                        if (breakpoint <= Breakpoint.SM) 30.px else
+                                            if (breakpoint <= Breakpoint.MD) 35.px else
+                                                if (breakpoint <= Breakpoint.LG) 40.px else 44.px
+                                )
+                                .alignSelf(AlignSelf.SelfStart)
+                                 // Disable right-click / long-press
+                                .onContextMenu { event ->
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                },
+                            src = ResObject.Icon.arrowBack,
+                            alt = "close icon"
+                        )
+
+
 
                         VideoPlayer(
                             videoUrl = portfolioSelected!!.videoLink,
@@ -158,7 +170,8 @@ fun InfoPage() {
                                             if (breakpoint <= Breakpoint.MD) 78.percent else
                                                 if (breakpoint <= Breakpoint.LG) 78.percent else 65.percent
                                 )
-                        ) {
+                        )
+                        {
 
 
                             Column(
@@ -179,7 +192,12 @@ fun InfoPage() {
                                                         if (breakpoint <= Breakpoint.MD) 42.px else
                                                             if (breakpoint <= Breakpoint.LG) 48.px else 50.px
                                             )
-                                            .borderRadius(r = 100.percent),
+                                            .borderRadius(r = 100.percent)
+                                             // Disable right-click / long-press
+                                            .onContextMenu { event ->
+                                                event.preventDefault()
+                                                event.stopPropagation()
+                                            },
                                         src = portfolioSelected!!.projectLogo,
                                         alt = "project logo"
                                     )
@@ -277,7 +295,7 @@ fun InfoPage() {
                     }
 
 
-                }
+
 
 
             }
@@ -309,12 +327,12 @@ private fun VideoPlayer(
 
     var showThumbnail by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit){
-        delay(2000)
-        if (videoRef.value == null){
-            showThumbnail = true
-        }
-    }
+//    LaunchedEffect(Unit){
+//        delay(2000)
+//        if (videoRef.value == null){
+//            showThumbnail = true
+//        }
+//    }
 
     LaunchedEffect(isVideoFreamFocused,isCustomControlFocused ){
 
@@ -374,70 +392,96 @@ private fun VideoPlayer(
                     .width(100.percent)
                     .height(100.percent)
                     .aspectRatio(16.0 / 9.0)
-                    .borderRadius(15.px),
+                    .borderRadius(15.px)
+                    .zIndex(60)
+                        // Disable right-click / long-press
+                    .onContextMenu { event ->
+                        event.preventDefault()
+                        event.stopPropagation()
+                    },
                 src = thumbnail,
                 alt = "video thumbnail logo"
             )
         }
 
 
-
-        Box {
-
+        if (!showThumbnail) {
 
 
-            // Video element without controls
-            Video(
-                attrs = Modifier
-                    .width(100.percent)
-                    .height(100.percent)
-                    .borderRadius(20.px)
-                    //.objectFit(ObjectFit.Contain)
-                    .onMouseOut {
-                        isVideoFreamFocused = false
-                    }
-                    .onMouseEnter {
-                        isVideoFreamFocused = true
-                    }
-                    .aspectRatio(16.0 / 9.0)  // 16:9 aspect ratio
-                    .toAttrs {
-                        attr("src", videoUrl)
-                        //attr("poster", thumbnail)
-                        attr("controls", "false")
-                        attr("playsinline", "true")
-                       // attr("playsinline", "true")
-
-                        attr("muted", "true")      // required for autoplay
-                        attr("autoplay", "true")   // hint browser to autoplay
-
-                        attr("preload", "auto") // Helps with caching by preloading metadata
-                        attr("loop", "true")
-
-                        ref { element ->
-                            videoRef.value = element
-
-                            videoRef.value?.playsInline = true
-                            videoRef.value?.controls = false
-                            videoRef.value?.muted = true
-                            videoRef.value?.autoplay = true
-                            //videoRef.value?.poster = thumbnail
-                            videoRef.value?.preload = "auto"
-                            videoRef.value?.loop = true
+            Box {
 
 
-                            videoRef.value?.onended = {
-                                showThumbnail = false
-                                isPlaying = false
-                            }
+                // Video element without controls
+                Video(
+                    attrs = Modifier
+                        .width(100.percent)
+                        .height(100.percent)
+                        .borderRadius(20.px)
+                        .objectFit(ObjectFit.Cover)
+                        .thenIf(
+                            condition = !isDesktop(),
+                            other = Modifier
+                                .onTouchEnd {
+                                    isVideoFreamFocused = false
+                                }
+                                .onTouchStart {
+                                    isVideoFreamFocused = true
+                                }
+                        )
+                        .thenIf(
+                            condition = isDesktop(),
+                            other = Modifier
+                                .onMouseOut {
+                                    isVideoFreamFocused = false
+                                }
+                                .onMouseEnter {
+                                    isVideoFreamFocused = true
+                                }
+                        )
+                        .aspectRatio(16.0 / 9.0)  // 16:9 aspect ratio
+                         // Disable right-click / long-press
+                        .onContextMenu { event ->
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        .toAttrs {
+                            attr("src", videoUrl)
+                            attr("poster", thumbnail)
+                            attr("controls", "false")
+                            attr("playsinline", "true")
+                            // attr("playsinline", "true")
 
-                            // play as soon as it's ready
-                            videoRef.value?.oncanplay = {
-                                showThumbnail = false
-                               // element.muted = true  // ensure muted
-                                //element.controls = false
+                            attr("muted", "true")      // required for autoplay
+                            attr("autoplay", "true")   // hint browser to autoplay
 
-                                // Try to play and handle any errors
-                                /*
+                            attr("preload", "auto") // Helps with caching by preloading metadata
+                            attr("loop", "true")
+
+                            ref { element ->
+                                videoRef.value = element
+
+                                videoRef.value?.playsInline = true
+                                videoRef.value?.controls = false
+                                videoRef.value?.muted = true
+                                videoRef.value?.autoplay = true
+                                //videoRef.value?.poster = thumbnail
+                                videoRef.value?.preload = "auto"
+                                videoRef.value?.loop = true
+
+
+                                videoRef.value?.onended = {
+                                    showThumbnail = false
+                                    isPlaying = false
+                                }
+
+                                // play as soon as it's ready
+                                videoRef.value?.oncanplay = {
+                                    showThumbnail = false
+                                    // element.muted = true  // ensure muted
+                                    //element.controls = false
+
+                                    // Try to play and handle any errors
+                                    /*
                                 element.play().catch { e ->
                                     console.log("Autoplay prevented: ", e)
                                     // Fallback: show controls if autoplay is blocked
@@ -445,122 +489,163 @@ private fun VideoPlayer(
                                 }
                                  */
 
-                               // element.play()
-                                isPlaying = true
-                                videoRef.value?.play()?.catch {
-                                    isPlaying = false
+                                    // element.play()
+                                    isPlaying = true
+                                    videoRef.value?.play()?.catch {
+                                        isPlaying = false
+                                    }
                                 }
-                            }
 
 
-                            // video failed to load (invalid or broken URL)
-                            videoRef.value?.onerror = { _: dynamic, _: String, _: Int, _: Int, _: Any? ->
-                                // console.log(" Video failed to load: $videoUrl")
-                                videoRef.value = null
-                                null // must return dynamic (usually null)
-                            }
+                                // video failed to load (invalid or broken URL)
+                                videoRef.value?.onerror = { _: dynamic, _: String, _: Int, _: Int, _: Any? ->
+                                    // console.log(" Video failed to load: $videoUrl")
+                                    videoRef.value = null
+                                    showThumbnail = true
+                                    null // must return dynamic (usually null)
+                                }
 
 
-                            // Listen for video error
+                                // Listen for video error
 //                        element.addEventListener("error", {
 //                            console.log("Video failed to load: $videoUrl")
 //                            videoRef.value = null
 //                        })
 
 
-                            onDispose {
-                                videoRef.value?.pause()
-                                isPlaying = false
-                                videoRef.value = null
-                            }
-                        }
-                    }
-            )
-
-
-
-
-
-            if (videoRef.value != null && showCustomControl) {
-
-                Image(
-                    modifier = Modifier
-                        .cursor(Cursor.Pointer)
-                        .size(
-                            if (breakpoint <= Breakpoint.ZERO) 28.px else
-                                if (breakpoint <= Breakpoint.SM) 37.px else
-                                    if (breakpoint <= Breakpoint.MD) 40.px else
-                                        if (breakpoint <= Breakpoint.LG) 45.px else 50.px
-                        )
-
-                        .borderRadius(r = 100.percent)
-                        .background(color = ThemeByKizito.Primary_ALPHA3.rgb)
-                        .padding(5.px)
-                        .transition(Transition.Companion.of(property = "translate", duration = 200.ms))
-                        // .position(Position.Sticky)
-                       // .position(Position.Absolute)
-                        .align(Alignment.Center)
-                        .onMouseOut {
-                            isCustomControlFocused = false
-                        }
-                        .onMouseEnter {
-                            isCustomControlFocused = true
-                        }
-                        .onClick {
-                            val video = videoRef.value
-                            if (video != null) {
-                                if (isPlaying) {
-                                    video.pause()
+                                onDispose {
+                                    videoRef.value?.pause()
                                     isPlaying = false
-                                } else {
-                                    video.play()
-                                    isPlaying = true
+                                    videoRef.value = null
                                 }
                             }
                         }
-                        .zIndex(2),
-                    src = if (isPlaying) ResObject.Icon.pause_icon else ResObject.Icon.play_icon,
-                    alt = "Play pause icon"
                 )
 
 
-                // Fullscreen toggle
-                Image(
-                    modifier = Modifier
-                        .size(
-                            if (breakpoint <= Breakpoint.ZERO) 20.px else
-                                if (breakpoint <= Breakpoint.MD) 25.px else
-                                    if (breakpoint <= Breakpoint.LG) 30.px else 32.px
-                        )
-                        .align(Alignment.BottomEnd)
-                        .alignSelf(AlignSelf.SelfEnd)
-                        .cursor(Cursor.Pointer)
-                        //.position(Position.Sticky)
-                        //.position(Position.Absolute)
-                        .margin(12.px)
-                        .borderRadius(20.percent)
-                        .padding(all = 2.px)
-                        .background(color = ThemeByKizito.Primary_ALPHA3.rgb)
-                        .onMouseOut {
-                            isCustomControlFocused = false
-                        }
-                        .onMouseEnter {
-                            isCustomControlFocused = true
-                        }
-                        .onClick {
 
-                            if (videoRef.value != null) {
-                                if (js("document.fullscreenElement") == null) {
-                                    videoRef.value!!.requestFullscreen()
-                                } else {
-                                    js("document.exitFullscreen()")
+
+
+                if (videoRef.value != null && showCustomControl) {
+
+                    Image(
+                        modifier = Modifier
+                            .cursor(Cursor.Pointer)
+                            .size(
+                                if (breakpoint <= Breakpoint.ZERO) 28.px else
+                                    if (breakpoint <= Breakpoint.SM) 37.px else
+                                        if (breakpoint <= Breakpoint.MD) 40.px else
+                                            if (breakpoint <= Breakpoint.LG) 45.px else 50.px
+                            )
+
+                            .borderRadius(r = 100.percent)
+                            .background(color = ThemeByKizito.Primary_ALPHA3.rgb)
+                            .padding(5.px)
+                            .transition(Transition.Companion.of(property = "translate", duration = 200.ms))
+                            // .position(Position.Sticky)
+                            // .position(Position.Absolute)
+                            .align(Alignment.Center)
+                            .thenIf(
+                                condition = !isDesktop(),
+                                other = Modifier
+                                    .onTouchEnd {
+                                        isCustomControlFocused = false
+                                    }
+                                    .onTouchStart {
+                                        isCustomControlFocused = true
+                                    }
+                            )
+                            .thenIf(
+                                condition = isDesktop(),
+                                other = Modifier
+                                    .onMouseOut {
+                                        isCustomControlFocused = false
+                                    }
+                                    .onMouseEnter {
+                                        isCustomControlFocused = true
+                                    }
+                            )
+                            .onClick {
+                                val video = videoRef.value
+                                if (video != null) {
+                                    if (isPlaying) {
+                                        video.pause()
+                                        isPlaying = false
+                                    } else {
+                                        video.play()
+                                        isPlaying = true
+                                    }
                                 }
                             }
-                        }
-                        .zIndex(2),
-                    src = ResObject.Icon.video_full_screen_icon,
-                    alt = "Fullscreen"
-                )
+                            .zIndex(2)
+                                // Disable right-click / long-press
+                            .onContextMenu { event ->
+                                event.preventDefault()
+                                event.stopPropagation()
+                            },
+                        src = if (isPlaying) ResObject.Icon.pause_icon else ResObject.Icon.play_icon,
+                        alt = "Play pause icon"
+                    )
+
+
+                    // Fullscreen toggle
+                    Image(
+                        modifier = Modifier
+                            .size(
+                                if (breakpoint <= Breakpoint.ZERO) 20.px else
+                                    if (breakpoint <= Breakpoint.MD) 25.px else
+                                        if (breakpoint <= Breakpoint.LG) 30.px else 32.px
+                            )
+                            .align(Alignment.BottomEnd)
+                            .alignSelf(AlignSelf.SelfEnd)
+                            .cursor(Cursor.Pointer)
+                            //.position(Position.Sticky)
+                            //.position(Position.Absolute)
+                            .margin(12.px)
+                            .borderRadius(20.percent)
+                            .padding(all = 2.px)
+                            .background(color = ThemeByKizito.Primary_ALPHA3.rgb)
+                            .thenIf(
+                                condition = !isDesktop(),
+                                other = Modifier
+                                    .onTouchEnd {
+                                        isCustomControlFocused = false
+                                    }
+                                    .onTouchStart {
+                                        isCustomControlFocused = true
+                                    }
+                            )
+                            .thenIf(
+                                condition = isDesktop(),
+                                other = Modifier
+                                    .onMouseOut {
+                                        isCustomControlFocused = false
+                                    }
+                                    .onMouseEnter {
+                                        isCustomControlFocused = true
+                                    }
+                            )
+                            .onClick {
+
+                                if (videoRef.value != null) {
+                                    if (js("document.fullscreenElement") == null) {
+                                        videoRef.value!!.requestFullscreen()
+                                    } else {
+                                        js("document.exitFullscreen()")
+                                    }
+                                }
+                            }
+                            .zIndex(2)
+                             // Disable right-click / long-press
+                            .onContextMenu { event ->
+                                event.preventDefault()
+                                event.stopPropagation()
+                            },
+                        src = ResObject.Icon.video_full_screen_icon,
+                        alt = "Fullscreen"
+                    )
+
+                }
 
             }
 
@@ -663,7 +748,12 @@ private fun CustomImage(
 
     Link(
         modifier = Modifier
-            .textDecorationLine(TextDecorationLine.None),
+            .textDecorationLine(TextDecorationLine.None)
+                // Disable right-click / long-press
+            .onContextMenu { event ->
+                event.preventDefault()
+                event.stopPropagation()
+            },
         path = projectLink,
         openExternalLinksStrategy = OpenLinkStrategy.IN_NEW_TAB
     ){

@@ -83,7 +83,12 @@ fun FooterContent(
 
         Image(
             modifier = Modifier
-                .size(100.px),
+                .size(100.px)
+                 // Disable right-click / long-press
+                .onContextMenu { event ->
+                    event.preventDefault()
+                    event.stopPropagation()
+                },
             src = ResObject.Image.logo,
             description = "Logo Image"
         )
